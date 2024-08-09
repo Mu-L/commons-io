@@ -130,7 +130,7 @@ public class IOUtils {
     // or return one of them.
 
     /**
-     * CR char.
+     * CR char '{@value}'.
      *
      * @since 2.9.0
      */
@@ -147,12 +147,12 @@ public class IOUtils {
     public static final char DIR_SEPARATOR = File.separatorChar;
 
     /**
-     * The UNIX directory separator character.
+     * The UNIX directory separator character '{@value}'.
      */
     public static final char DIR_SEPARATOR_UNIX = '/';
 
     /**
-     * The Windows directory separator character.
+     * The Windows directory separator character '{@value}'.
      */
     public static final char DIR_SEPARATOR_WINDOWS = '\\';
 
@@ -164,13 +164,13 @@ public class IOUtils {
     public static final byte[] EMPTY_BYTE_ARRAY = {};
 
     /**
-     * Represents the end-of-file (or stream).
+     * Represents the end-of-file (or stream) value {@value}.
      * @since 2.5 (made public)
      */
     public static final int EOF = -1;
 
     /**
-     * LF char.
+     * LF char '{@value}'.
      *
      * @since 2.9.0
      */
@@ -1746,7 +1746,7 @@ public class IOUtils {
      * Returns the length of the given array in a null-safe manner.
      *
      * @param array an array or null
-     * @return the array length -- or 0 if the given array is null.
+     * @return the array length, or 0 if the given array is null.
      * @since 2.7
      */
     public static int length(final byte[] array) {
@@ -1757,7 +1757,7 @@ public class IOUtils {
      * Returns the length of the given array in a null-safe manner.
      *
      * @param array an array or null
-     * @return the array length -- or 0 if the given array is null.
+     * @return the array length, or 0 if the given array is null.
      * @since 2.7
      */
     public static int length(final char[] array) {
@@ -1768,7 +1768,7 @@ public class IOUtils {
      * Returns the length of the given CharSequence in a null-safe manner.
      *
      * @param csq a CharSequence or null
-     * @return the CharSequence length -- or 0 if the given CharSequence is null.
+     * @return the CharSequence length, or 0 if the given CharSequence is null.
      * @since 2.7
      */
     public static int length(final CharSequence csq) {
@@ -1779,7 +1779,7 @@ public class IOUtils {
      * Returns the length of the given array in a null-safe manner.
      *
      * @param array an array or null
-     * @return the array length -- or 0 if the given array is null.
+     * @return the array length, or 0 if the given array is null.
      * @since 2.7
      */
     public static int length(final Object[] array) {

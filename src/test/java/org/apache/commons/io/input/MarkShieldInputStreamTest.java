@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -123,17 +122,40 @@ public class MarkShieldInputStreamTest {
         }
     }
 
-    @SuppressWarnings("resource")
     @ParameterizedTest
     @MethodSource(AbstractInputStreamTest.ARRAY_LENGTHS_NAME)
     public void testReadAfterClose(final int len) throws Exception {
-        final InputStream shadow;
         try (MarkTestableInputStream in = new MarkTestableInputStream(new NullInputStream(len, false, false));
                 final MarkShieldInputStream msis = new MarkShieldInputStream(in)) {
             assertEquals(len, in.available());
-            shadow = in;
+            in.close();
+            assertThrows(IOException.class, in::read);
         }
-        assertEquals(IOUtils.EOF, shadow.read());
+    }
+
+    @ParameterizedTest
+    @MethodSource(AbstractInputStreamTest.ARRAY_LENGTHS_NAME)
+    public void testReadByteArrayAfterClose(final int len) throws Exception {
+        try (MarkTestableInputStream in = new MarkTestableInputStream(new NullInputStream(len, false, false));
+                final MarkShieldInputStream msis = new MarkShieldInputStream(in)) {
+            assertEquals(len, in.available());
+            in.close();
+            assertEquals(0, in.read(new byte[0]));
+            assertThrows(IOException.class, () -> in.read(new byte[2]));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource(AbstractInputStreamTest.ARRAY_LENGTHS_NAME)
+    public void testReadByteArrayIntIntAfterClose(final int len) throws Exception {
+        try (MarkTestableInputStream in = new MarkTestableInputStream(new NullInputStream(len, false, false));
+                final MarkShieldInputStream msis = new MarkShieldInputStream(in)) {
+            assertEquals(len, in.available());
+            in.close();
+            assertEquals(0, in.read(new byte[0], 0, 1));
+            assertEquals(0, in.read(new byte[1], 0, 0));
+            assertThrows(IOException.class, () -> in.read(new byte[2], 0, 1));
+        }
     }
 
     @Test

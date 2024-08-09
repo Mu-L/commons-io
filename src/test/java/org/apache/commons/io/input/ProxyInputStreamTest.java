@@ -10,7 +10,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUProxyInputStreamFixture WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -20,6 +20,8 @@ package org.apache.commons.io.input;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
@@ -29,6 +31,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
@@ -46,10 +50,6 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
 
         ProxyInputStreamFixture(final InputStream proxy) {
             super(proxy);
-        }
-
-        void setIn(final InputStream proxy) {
-            in = proxy;
         }
     }
 
@@ -69,12 +69,28 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
         assertFalse(spy.isClosed(), "closed");
     }
 
-    @SuppressWarnings({ "resource", "unused" }) // For subclasses
-    protected T createFixture() throws IOException {
-        return (T) new ProxyInputStreamFixture(createProxySource());
+    /**
+     * Asserts that a ProxyInputStream's markSupported() equals the proxied value.
+     *
+     * @param inputStream The stream to test.
+     */
+    @SuppressWarnings("resource") // unwrap() is a getter
+    protected void assertMarkSupportedEquals(final ProxyInputStream inputStream) {
+        assertNotNull(inputStream, "inputStream");
+        assertEquals(inputStream.unwrap().markSupported(), inputStream.markSupported());
     }
 
-    protected InputStream createProxySource() {
+    @SuppressWarnings({ "resource", "unused", "unchecked" }) // For subclasses
+    protected T createFixture() throws IOException {
+        return (T) new ProxyInputStreamFixture(createOriginInputStream());
+    }
+
+    @SuppressWarnings("unchecked")
+    protected T createFixture(final InputStream proxy) {
+        return (T) new ProxyInputStreamFixture(proxy);
+    }
+
+    protected InputStream createOriginInputStream() {
         return CharSequenceInputStream.builder().setCharSequence("abc").get();
     }
 
@@ -106,7 +122,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
 
     @Test
     public void testAvailableNull() throws IOException {
-        try (ProxyInputStreamFixture inputStream = new ProxyInputStreamFixture(null)) {
+        try (T inputStream = createFixture(null)) {
             assertEquals(0, inputStream.available());
             inputStream.setIn(createFixture());
             assertEquals(3, inputStream.available());
@@ -121,6 +137,45 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
         // empty
     }
 
+    //@Test
+    public void testMarkOnNull() throws IOException {
+        try (T inputStream = createFixture(null)) {
+            inputStream.mark(1);
+            inputStream.setIn(createFixture());
+            inputStream.mark(1);
+            IOUtils.toByteArray(inputStream);
+            inputStream.mark(1);
+            inputStream.setIn(null);
+            inputStream.mark(1);
+        }
+    }
+
+    @Test
+    public void testMarkSupported() throws IOException {
+        try (T inputStream = createFixture()) {
+            assertMarkSupportedEquals(inputStream);
+        }
+    }
+
+    @SuppressWarnings("resource")
+    @Test
+    public void testMarkSupportedAfterClose() throws IOException {
+        final T shadow;
+        try (T inputStream = createFixture()) {
+            shadow = inputStream;
+        }
+        assertMarkSupportedEquals(shadow);
+    }
+
+    @Test
+    public void testMarkSupportedOnNull() throws IOException {
+        try (ProxyInputStream fixture = createFixture()) {
+            assertMarkSupportedEquals(fixture);
+            fixture.setIn(null);
+            assertFalse(fixture.markSupported());
+        }
+    }
+
     @Test
     public void testRead() throws IOException {
         try (T inputStream = createFixture()) {
@@ -132,22 +187,36 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertEquals('c', found);
             found = inputStream.read();
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 
-    @SuppressWarnings("resource")
     @Test
-    public void testReadAfterClose() throws IOException {
-        InputStream shadow;
-        try (InputStream inputStream = createFixture()) {
-            shadow = inputStream;
-        }
-        assertEquals(IOUtils.EOF, shadow.read());
+    public void testReadAfterClose_ByteArrayInputStream() throws IOException {
         try (InputStream inputStream = new ProxyInputStreamFixture(new ByteArrayInputStream("abc".getBytes(StandardCharsets.UTF_8)))) {
-            shadow = inputStream;
+            inputStream.close();
+            // ByteArrayInputStream does not throw on a closed stream.
+            assertNotEquals(IOUtils.EOF, inputStream.read());
         }
-        assertEquals(IOUtils.EOF, shadow.read());
+    }
+
+    @Test
+    public void testReadAfterClose_ChannelInputStream() throws IOException {
+        try (InputStream inputStream = new ProxyInputStreamFixture(
+                Files.newInputStream(Paths.get("src/test/resources/org/apache/commons/io/abitmorethan16k.txt")))) {
+            inputStream.close();
+            // ChannelInputStream throws when closed
+            assertThrows(IOException.class, inputStream::read);
+        }
+    }
+
+    @Test
+    public void testReadAfterClose_CharSequenceInputStream() throws IOException {
+        try (InputStream inputStream = createFixture()) {
+            inputStream.close();
+            // CharSequenceInputStream (like ByteArrayInputStream) does not throw on a closed stream.
+            assertEquals(IOUtils.EOF, inputStream.read());
+        }
     }
 
     @Test
@@ -159,7 +228,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertArrayEquals(new byte[] { 0, 0, 'a', 'b', 'c' }, dest);
             found = inputStream.read(dest, 2, 3);
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 
@@ -172,7 +241,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertArrayEquals(new byte[] { 'a', 'b', 'c', 0, 0 }, dest);
             found = inputStream.read(dest, 0, 5);
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 
@@ -189,7 +258,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertArrayEquals(new byte[] { 'c', 0, 0, 0, 0 }, dest);
             found = inputStream.read(dest, 0, 2);
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 
@@ -202,7 +271,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertArrayEquals(new byte[] { 'a', 'b', 'c', 0, 0 }, dest);
             found = inputStream.read(dest);
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 
@@ -219,7 +288,7 @@ public class ProxyInputStreamTest<T extends ProxyInputStream> {
             assertArrayEquals(new byte[] { 'c', 0 }, dest);
             found = inputStream.read(dest);
             assertEquals(-1, found);
-            testEos(inputStream);
+            testEos((T) inputStream);
         }
     }
 

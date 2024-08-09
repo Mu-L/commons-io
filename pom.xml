@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-parent</artifactId>
-    <version>71</version>
+    <version>72</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>commons-io</groupId>
@@ -96,7 +96,7 @@ file comparators, endian transformation classes, and much more.
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.15.0</version>
+      <version>3.16.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -376,7 +376,7 @@ file comparators, endian transformation classes, and much more.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.3.0</version>
+            <version>3.4.0</version>
             <executions>
               <execution>
                 <id>benchmark</id>

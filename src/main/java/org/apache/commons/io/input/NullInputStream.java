@@ -38,12 +38,15 @@ import java.io.InputStream;
  *
  * <pre>
  *  public class TestInputStream extends NullInputStream {
+ *
  *      public TestInputStream(int size) {
  *          super(size);
  *      }
+ *
  *      protected int processByte() {
  *          return ... // return required value here
  *      }
+ *
  *      protected void processBytes(byte[] bytes, int offset, int length) {
  *          for (int i = offset; i &lt; length; i++) {
  *              bytes[i] = ... // set array value here
@@ -78,6 +81,9 @@ public class NullInputStream extends AbstractInputStream {
 
     /**
      * Constructs an {@link InputStream} that emulates a size 0 stream which supports marking and does not throw EOFException.
+     * <p>
+     * This is an "empty" input stream.
+     * </p>
      *
      * @since 2.7
      */
@@ -170,7 +176,6 @@ public class NullInputStream extends AbstractInputStream {
      * @throws IOException if {@code throwEofException} is set to {@code true}.
      */
     private int handleEof() throws IOException {
-        super.close();
         checkThrowEof("handleEof()");
         return EOF;
     }
@@ -250,10 +255,7 @@ public class NullInputStream extends AbstractInputStream {
      */
     @Override
     public int read() throws IOException {
-        if (isClosed()) {
-            checkThrowEof("read()");
-            return EOF;
-        }
+        checkOpen();
         if (position == size) {
             return handleEof();
         }
@@ -286,10 +288,10 @@ public class NullInputStream extends AbstractInputStream {
      */
     @Override
     public int read(final byte[] bytes, final int offset, final int length) throws IOException {
-        if (isClosed()) {
-            checkThrowEof("read(byte[], int, int)");
-            return EOF;
+        if (bytes.length == 0 || length == 0) {
+            return 0;
         }
+        checkOpen();
         if (position == size) {
             return handleEof();
         }
