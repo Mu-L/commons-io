@@ -7,7 +7,7 @@
  (the "License"); you may not use this file except in compliance with
  the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,6 +47,7 @@ The <action> type attribute can be add,update,fix,remove.
   <body>
     <release version="2.20.0" date="YYYY-MM-DD" description="Version 2.19.1: Java 8 or later is required.">
       <!-- FIX -->
+      <action dev="maxxedev" type="fix"                due-to="maxxedev">QueueInputStream reads all but the first byte without waiting</action>
       <action dev="ggregory" type="fix"                due-to="Jesse Glick">[javadoc] Rename parameter of ProxyOutputStream.write(int) #740.</action>
       <action dev="ggregory" type="fix" issue="IO-875" due-to="Pierre Baumard, Gary Gregory">CopyDirectoryVisitor ignores fileFilter #743.</action>
       <action dev="ggregory" type="fix"                due-to="Gary Gregory">org.apache.commons.io.build.AbstractOrigin.getReader(Charset) now maps a null Charset to the default Charset.</action>
@@ -57,8 +58,21 @@ The <action> type attribute can be add,update,fix,remove.
       <action dev="ggregory" type="fix"                due-to="Gary Gregory">org.apache.commons.io.build.AbstractOrigin.AbstractRandomAccessFileOrigin.getWriter(Charset) now maps a null Charset to the default Charset.</action>
       <action dev="ggregory" type="fix"                due-to="Gary Gregory">org.apache.commons.io.build.AbstractOrigin.OutputStreamOrigin.getWriter(Charset) now maps a null Charset to the default Charset.</action>
       <action dev="ggregory" type="fix"                due-to="Ryan Kurtz, Gary Gregory">FileUtils.readLines(File, Charset) now maps a null Charset to the default Charset #744.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashCr" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.WindowsLineEndingInputStream, org.apache.commons.io.input.WindowsLineEndingInputStream] At WindowsLineEndingInputStream.java:[line 77]Another occurrence at WindowsLineEndingInputStream.java:[line 81] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashCr" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.WindowsLineEndingInputStream] At WindowsLineEndingInputStream.java:[line 112] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashLf" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.WindowsLineEndingInputStream] At WindowsLineEndingInputStream.java:[line 113] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashLf" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.UnixLineEndingInputStream] At UnixLineEndingInputStream.java:[line 75] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atEos" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.UnixLineEndingInputStream] At UnixLineEndingInputStream.java:[line 120] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashCr" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.UnixLineEndingInputStream] At UnixLineEndingInputStream.java:[line 124] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "atSlashLf" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.UnixLineEndingInputStream] At UnixLineEndingInputStream.java:[line 125] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "closed" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.ProxyInputStream] At ProxyInputStream.java:[line 233] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="Gary Gregory">Fix SpotBugs [ERROR] Medium: Shared primitive variable "propagateClose" in one thread may not yield the value of the most recent write from another thread [org.apache.commons.io.input.BoundedInputStream] At BoundedInputStream.java:[line 555] AT_STALE_THREAD_WRITE_OF_PRIMITIVE.</action>
+      <action dev="ggregory" type="fix"                due-to="maxxedev, Piotr P. Karwasz, Gary Gregory">QueueInputStream reads all but the first byte without waiting. #748.</action> 
       <!-- ADD -->
-      <action dev="ggregory" type="add" issue="IO-875" due-to="Pierre Baumard, Gary Gregory">Add and use org.apache.commons.io.file.CountingPathVisitor.accept(Path, BasicFileAttributes) #743.</action> 
+      <action dev="ggregory" type="add" issue="IO-875" due-to="Pierre Baumard, Gary Gregory">Add and use org.apache.commons.io.file.CountingPathVisitor.accept(Path, BasicFileAttributes) #743.</action>
+      <action dev="ggregory" type="add" due-to="Gary Gregory">Add org.apache.commons.io.Charsets.isAlias(Charset, String).</action>
+      <action dev="ggregory" type="add" due-to="Gary Gregory">Add org.apache.commons.io.Charsets.isUTF8(Charset).</action>
+      <action dev="ggregory" type="add" due-to="Gary Gregory">Add org.apache.commons.io.Charsets.toCharsetDefault(String, Charset).</action>
       <!-- UPDATE -->
     </release>
     <release version="2.19.0" date="2025-04-08" description="Version 2.19.0: Java 8 or later is required.">
